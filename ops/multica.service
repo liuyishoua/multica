@@ -1,0 +1,20 @@
+[Unit]
+Description=Multica production stack
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/ubuntu/leo-project/multica
+ExecStart=/usr/bin/docker compose -f docker-compose.selfhost.yml -f ops/compose.production.yml up -d --wait --wait-timeout 180
+ExecStop=/usr/bin/docker compose -f docker-compose.selfhost.yml -f ops/compose.production.yml stop
+TimeoutStartSec=240
+TimeoutStopSec=120
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target

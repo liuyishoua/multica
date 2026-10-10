@@ -1,0 +1,5 @@
+[Unit]
+Description=Reload renewed TLS certificate for Multica
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl try-restart multica-proxy.service

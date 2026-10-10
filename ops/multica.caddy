@@ -1,0 +1,30 @@
+{
+    admin off
+    auto_https disable_redirects
+}
+
+https://d.58nft.net:9447 {
+    encode zstd gzip
+    tls /var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/d.58nft.net/d.58nft.net.crt /var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/d.58nft.net/d.58nft.net.key
+    @workspace_page {
+        path /leo /leo/*
+        method GET HEAD
+    }
+    handle @workspace_page {
+        forward_auth 127.0.0.1:8091 {
+            uri /session-check
+        }
+        reverse_proxy 127.0.0.1:3000
+    }
+    @default_login path / /login /signup /register
+    handle @default_login {
+        reverse_proxy 127.0.0.1:8091
+    }
+    @backend path /api/* /v1/* /ws /ws/* /auth/* /uploads/* /health /healthz /readyz
+    handle @backend {
+        reverse_proxy 127.0.0.1:8080
+    }
+    handle {
+        reverse_proxy 127.0.0.1:3000
+    }
+}

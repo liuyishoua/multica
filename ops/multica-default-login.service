@@ -1,0 +1,18 @@
+[Unit]
+Description=Multica shared default-account login
+After=network.target multica.service
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/leo-project/multica
+EnvironmentFile=/home/ubuntu/leo-project/multica/.env
+Environment=MULTICA_DEFAULT_USER_ID=ec09e4d9-86d1-4f97-8767-f453b79287c9
+Environment=MULTICA_DEFAULT_EMAIL=fyhvyhj@gmail.com
+Environment=MULTICA_DEFAULT_NAME=fyhvyhj
+ExecStart=/usr/bin/python3 /home/ubuntu/leo-project/multica/ops/default_login.py
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+[Install]
+WantedBy=multi-user.target

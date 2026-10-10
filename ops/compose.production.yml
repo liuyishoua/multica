@@ -1,0 +1,14 @@
+services:
+  postgres:
+    logging: &bounded_logs
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    mem_limit: 768m
+  backend:
+    logging: *bounded_logs
+    mem_limit: 768m
+  frontend:
+    logging: *bounded_logs
+    mem_limit: 768m

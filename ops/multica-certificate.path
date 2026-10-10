@@ -1,0 +1,7 @@
+[Unit]
+Description=Reload Multica HTTPS when its shared certificate renews
+[Path]
+PathChanged=/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/d.58nft.net/d.58nft.net.crt
+Unit=multica-certificate.service
+[Install]
+WantedBy=multi-user.target

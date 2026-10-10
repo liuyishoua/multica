@@ -1,0 +1,22 @@
+[Unit]
+Description=Multica local Codex agent runtime
+Wants=network-online.target
+After=network-online.target multica.service multica-proxy.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu
+Environment=HOME=/home/ubuntu
+Environment=PATH=/home/ubuntu/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+UMask=0077
+ExecStart=/home/ubuntu/.local/bin/multica daemon start --foreground --no-auto-update --no-auto-reload
+Restart=always
+RestartSec=10
+TimeoutStopSec=60
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target

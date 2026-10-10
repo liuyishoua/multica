@@ -1,0 +1,15 @@
+[Unit]
+Description=Multica HTTPS reverse proxy
+After=network-online.target multica.service caddy.service multica-default-login.service
+Wants=network-online.target multica-default-login.service
+
+[Service]
+User=caddy
+Group=caddy
+ExecStart=/usr/bin/caddy run --config /etc/caddy/multica.caddy --adapter caddyfile
+Restart=always
+RestartSec=5
+LimitNOFILE=1048576
+
+[Install]
+WantedBy=multi-user.target

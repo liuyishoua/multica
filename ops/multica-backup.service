@@ -1,0 +1,7 @@
+[Unit]
+Description=Back up Multica database, uploads and deployment secrets
+After=multica.service
+[Service]
+Type=oneshot
+ExecStart=/home/ubuntu/leo-project/multica/ops/backup.sh
+TimeoutStartSec=30min

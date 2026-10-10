@@ -1,0 +1,7 @@
+[Unit]
+Description=Check Multica availability and recover an unresponsive application
+After=multica.service
+[Service]
+Type=oneshot
+ExecStart=/home/ubuntu/leo-project/multica/ops/watchdog.sh
+TimeoutStartSec=180
