@@ -335,6 +335,9 @@ function SourceCell({
             provider: origin.provider,
           })
         : t(($) => $.table.source_runtime_unknown);
+  } else if (origin.type === "skillhub") {
+    icon = <Download className="h-3 w-3 shrink-0" />;
+    label = t(($) => $.table.source_skillhub);
   } else if (origin.type === "clawhub") {
     icon = <Download className="h-3 w-3 shrink-0" />;
     label = t(($) => $.table.source_clawhub);

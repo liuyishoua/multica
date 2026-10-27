@@ -92,6 +92,7 @@ export function countActiveFilterDimensions(
 const ORIGIN_TYPES: OriginType[] = [
   "manual",
   "runtime_local",
+  "skillhub",
   "clawhub",
   "skills_sh",
   "github",
@@ -180,6 +181,7 @@ export function SkillListToolbar({
   const ORIGIN_LABELS: Record<OriginType, string> = {
     manual: t(($) => $.table.source_manual),
     runtime_local: t(($) => $.table.source_runtime_unknown),
+    skillhub: t(($) => $.table.source_skillhub),
     clawhub: t(($) => $.table.source_clawhub),
     skills_sh: t(($) => $.table.source_skills_sh),
     github: t(($) => $.table.source_github),

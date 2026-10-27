@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
-import { originSourceUrl, type OriginInfo } from "./origin";
+import { originSourceUrl, isRefreshableOrigin, readOrigin, type OriginInfo } from "./origin";
 
 // `origin` is persisted JSONB writable verbatim through the skill update API,
 // so originSourceUrl is the only thing standing between a hand-edited
@@ -68,5 +68,16 @@ describe("originSourceUrl", () => {
     expect(originSourceUrl(null)).toBeNull();
     expect(originSourceUrl(github(undefined))).toBeNull();
     expect(originSourceUrl(github(""))).toBeNull();
+  });
+});
+
+// SkillHub imports retain their publisher in the source URL.
+describe("SkillHub origin", () => {
+  it("supports source links and refresh for publisher-scoped imports", () => {
+    const origin: OriginInfo = { type: "skillhub", source_url: "https://skillhub.cn/skills/alice/demo" };
+    expect(readOrigin({ config: { origin } } as Parameters<typeof readOrigin>[0])).toEqual(origin);
+    expect(originSourceUrl(origin)).toBe(origin.source_url);
+    expect(isRefreshableOrigin(origin)).toBe(true);
+    expect(originSourceUrl({ ...origin, source_url: "https://skillhub.cn.evil.example/skills/alice/demo" })).toBeNull();
   });
 });

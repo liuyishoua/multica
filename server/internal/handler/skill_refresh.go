@@ -19,7 +19,7 @@ import (
 // errSkillNotRefreshable marks a skill whose stored provenance cannot be
 // re-fetched: manual skills, archive uploads (no origin), runtime-local
 // copies, or a hand-edited origin whose source_url no longer matches its type.
-var errSkillNotRefreshable = errors.New("this skill was not imported from a refreshable source (GitHub, skills.sh, or ClawHub)")
+var errSkillNotRefreshable = errors.New("this skill was not imported from a refreshable source (GitHub, skills.sh, SkillHub, or ClawHub)")
 
 // skillOriginRef is the minimal provenance needed to re-run an import.
 type skillOriginRef struct {
@@ -60,6 +60,8 @@ func refreshableOriginSource(originType string) (importSource, bool) {
 		return sourceGitHub, true
 	case "skills_sh":
 		return sourceSkillsSh, true
+	case "skillhub":
+		return sourceSkillHub, true
 	case "clawhub":
 		return sourceClawHub, true
 	default:
@@ -82,6 +84,8 @@ func fetchImportedSkillFromOrigin(ctx context.Context, httpClient *http.Client, 
 		return nil, errSkillNotRefreshable
 	}
 	switch source {
+	case sourceSkillHub:
+		return fetchFromSkillHub(ctx, httpClient, normalized)
 	case sourceClawHub:
 		return fetchFromClawHub(ctx, httpClient, normalized)
 	case sourceSkillsSh:

@@ -943,6 +943,7 @@ const (
 	sourceClawHub importSource = iota
 	sourceSkillsSh
 	sourceGitHub
+	sourceSkillHub
 )
 
 // detectImportSource determines the source from a URL.
@@ -965,6 +966,11 @@ func detectImportSource(raw string) (importSource, string, error) {
 
 	host := strings.ToLower(parsed.Hostname())
 	switch {
+	case host == "skillhub.cn" || host == "www.skillhub.cn":
+		if _, _, _, err := parseSkillHubURL(normalized); err != nil {
+			return 0, "", err
+		}
+		return sourceSkillHub, normalized, nil
 	case host == "skills.sh" || host == "www.skills.sh":
 		return sourceSkillsSh, normalized, nil
 	case host == "clawhub.ai" || host == "www.clawhub.ai":
@@ -976,7 +982,7 @@ func detectImportSource(raw string) (importSource, string, error) {
 		if !strings.Contains(raw, "/") || !strings.Contains(raw, ".") {
 			return sourceClawHub, raw, nil
 		}
-		return 0, "", fmt.Errorf("unsupported source: %s (supported: clawhub.ai, skills.sh, github.com)", host)
+		return 0, "", fmt.Errorf("unsupported source: %s (supported: clawhub.ai, skillhub.cn, skills.sh, github.com)", host)
 	}
 }
 
@@ -2368,6 +2374,8 @@ func (h *Handler) ImportSkill(w http.ResponseWriter, r *http.Request) {
 		imported, err = fetchFromSkillsSh(ctx, httpClient, normalized)
 	case sourceGitHub:
 		imported, err = fetchFromGitHub(ctx, httpClient, normalized)
+	case sourceSkillHub:
+		imported, err = fetchFromSkillHub(ctx, httpClient, normalized)
 	}
 	if err != nil {
 		status, msg := importFetchErrorResponse(ctx, err)

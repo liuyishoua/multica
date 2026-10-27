@@ -245,10 +245,16 @@ function ManualForm({
 // URL import form
 // ---------------------------------------------------------------------------
 
-type DetectedSource = "clawhub" | "skills.sh" | "github" | null;
+type DetectedSource = "skillhub" | "clawhub" | "skills.sh" | "github" | null;
 
 function detectUrlSource(url: string): DetectedSource {
   const u = url.trim().toLowerCase();
+  try {
+    const host = new URL(u.startsWith("http") ? u : `https://${u}`).hostname;
+    if (host === "skillhub.cn" || host === "www.skillhub.cn") return "skillhub";
+  } catch {
+    return null;
+  }
   if (u.includes("clawhub.ai")) return "clawhub";
   if (u.includes("skills.sh")) return "skills.sh";
   if (u.includes("github.com")) return "github";
@@ -319,6 +325,7 @@ function UrlForm({
 
   const submittingLabel = (() => {
     if (!loading) return t(($) => $.create.url.import);
+    if (source === "skillhub") return t(($) => $.create.url.importing_skillhub);
     if (source === "clawhub") return t(($) => $.create.url.importing_clawhub);
     if (source === "skills.sh") return t(($) => $.create.url.importing_skills_sh);
     if (source === "github") return t(($) => $.create.url.importing_github);
@@ -356,7 +363,13 @@ function UrlForm({
           <p className="mb-2 text-caption text-muted-foreground">
             {t(($) => $.create.url.supported_sources)}
           </p>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
+            <SourceCard
+              label="SkillHub"
+              exampleHost="skillhub.cn/skills/owner/skill"
+              browseUrl="https://skillhub.cn"
+              active={source === "skillhub"}
+            />
             <SourceCard
               label="ClawHub"
               exampleHost="clawhub.ai/owner/skill"

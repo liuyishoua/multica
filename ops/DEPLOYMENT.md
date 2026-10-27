@@ -4,7 +4,7 @@
 - 公网入口：<https://d.58nft.net:9447/>（默认自动登录）
 - 版本：官方 Docker 镜像 `v0.6.1`，不自动升级。
 - 管理邮箱：`fyhvyhj@gmail.com`，Leo 工作区所有者。
-- 当前采用共享默认账号：访问者无需邮箱或验证码，直接使用上述所有者账号进入 Leo 工作区；访问者具有该账号的权限。公开注册仍关闭。
+- 当前由 ops-hub 统一账号先校验应用权限，原始管理员默认可用，普通用户申请获批后才进入共享默认账号。获权成员在 Leo 工作区共享该账号的数据和权限。公开注册仍关闭。
 - PostgreSQL、后端、前端由 Docker Compose 运行；数据库与上传附件使用独立持久卷。
 - 后端及前端仅监听本机 8080、3000；公网通过 Caddy HTTPS 9447 访问。
 - 系统重启后自动启动，容器退出自动恢复，每分钟检查应用可用性；连续三次失败后重启应用容器。
@@ -13,7 +13,7 @@
 
 ## 默认自动登录
 
-按用户要求，网站 `/`、`/login`、`/signup`、`/register` 通过本机自动登录服务签发现有所有者账号的会话，然后跳转 `/leo/issues`。`/leo/*` 页面通过入口的 `forward_auth` 检查会话；已登录请求继续进入前端，缺失或失效的 Cookie 则重新签发共享账号会话，保留原路径和查询参数，避免新机器直接打开工作区或旧会话失效时因 `/api/me` 返回 401 而白屏。所有公网访问者共享该账号，包括其智能体操作权限。没有配置 QQ SMTP，也不需要邮件授权码。
+按用户要求，网站 `/`、`/login`、`/signup`、`/register` 通过本机自动登录服务签发现有所有者账号的会话，然后跳转 `/leo/issues`。`/leo/*` 页面通过入口的 `forward_auth` 检查会话；已登录请求继续进入前端，缺失或失效的 Cookie 则重新签发共享账号会话，保留原路径和查询参数，避免新机器直接打开工作区或旧会话失效时因 `/api/me` 返回 401 而白屏。仅通过统一应用授权的网页访问者共享该账号，包括其智能体操作权限。所有网页和 API 路径均先校验统一会话及应用权限，已有 Multica Cookie 不能绕过。原机器 API 的有效 Bearer 凭据独立认证，该路由移除 Cookie 后由后端验证；健康接口保留公开只读检查。没有配置 QQ SMTP，也不需要邮件授权码。
 
 - 服务：`multica-default-login.service`，仅监听 `127.0.0.1:8091`，开机自启、退出自动恢复。
 - 实现：`ops/default_login.py`，读取 `.env` 中的 JWT 密钥，兼容固定版本官方会话及 CSRF Cookie；每次签发前检查后端用户身份。
@@ -87,6 +87,16 @@ multica agent list
 
 官方参考：<https://github.com/multica-ai/multica/blob/main/SELF_HOSTING.md>。
 
+## 小红书 Leo 私信回复执行
+
+生产身份为 `小红书-leo`（`da72f33e-cac4-4ff0-a99d-d415219f3efc`），当前绑定 `Codex (Leo 本机服务器)`（`ed2437c9-fa66-4d96-8f0b-15069f1cd9f5`），显式使用 `gpt-6.1-sol`、`low`。工作台仍通过 Channel 接收结构化结果并执行小红书发送；家庭网络出口和账号发送控制由工作台维护，模型执行节点与平台出口分别配置。
+
+工作台独立快照回复任务用 `social-content-kit/scripts/reply_input.py` 一次读取完整 issue、绑定档案及对话/平台技能，直接返回最终 JSON。部署指令入口为 `agent-tools/social-content-kit/scripts/optimize_reply_agents.py`；它不更新模型和 runtime。原 Mac runtime 的 `using-superpowers` 仅对该身份禁用，其他账号和客户端技能保持各自配置。
+
+隔离性能测试：在 `xhs/` 下运行 `PYTHONPATH=. .venv/bin/python -m deploy.smoke_reply_latency`。该命令调用真实模型，须明确授权后执行；使用合成收件人和独立工作台数据库，没有平台发送器。报告在 `xhs/.local/synthetic-reply-latency-*/report.json`，记录 issue/run ID。两次本机普通文字测试均约 18.3 秒返回可用回复，不能作为图片、多轮复杂判断、并发负载或平台送达的时延保证。
+
+诊断依据和对照汇总保存于 `.local/reply-latency-report.json`。模型/思考配置及 runtime 变更前的字段备份分别为 `.local/reply-execution-settings-backup.json`、`.local/leo-runtime-comparison-backup.json`。回滚时通过 agent API 恢复备份字段；不要用恢复数据库或重启所有 runtime 的方式回滚单个 agent 的设置。
+
 ## 项目操作智能体
 
 - 智能体：`Leo 项目操作助手`，ID `fc8e609f-8374-4526-b58f-642e5dfc2914`，仅创建者可运行，单智能体并发 1。
@@ -98,3 +108,9 @@ multica agent list
 聊天入口：<https://d.58nft.net:9447/leo/chat?agent=fc8e609f-8374-4526-b58f-642e5dfc2914>。
 
 2026-10-09 平台执行验证：助手读取各项目状态、票务账号/任务列表与模型列表；在抖音 demo 环境创建临时标签、查询核对并删除。验证会话 01a120ac-c2ec-75e6-9c3e-d7e96c739500。
+
+## 首屏静态资源缓存
+
+`multica.caddy` 对 `/srv/multica-assets` 中已存在的 `/_next/static/` 资源提供本地文件服务，优先使用 Brotli/gzip 预压缩文件，保留一年 immutable 缓存。仅缓存框架生成的公开静态资源；页面、API、会话检查和 WebSocket 保持原来的代理与认证规则。缓存缺失时回源 Next 服务。
+
+升级前端后运行 `sudo python3 ops/cache-static-assets.py` 预热当前入口资源。脚本通过现有默认登录读取资源引用，仅在内存保存会话，不输出或缓存页面、Cookie、任务内容。旧文件无需立即删除，以支持已打开的旧页面。配置变更经 `sudo caddy validate --config ops/multica.caddy --adapter caddyfile` 后安装到 `/etc/caddy/multica.caddy`，仅重启 `multica-proxy.service`，无需重启 agent runtime。

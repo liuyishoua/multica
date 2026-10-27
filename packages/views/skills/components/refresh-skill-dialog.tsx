@@ -31,6 +31,7 @@ import { originSourceUrl, type OriginInfo } from "../lib/origin";
 /** Human name of the hosted source a refresh re-downloads from. */
 export function useRefreshSourceLabel(origin: OriginInfo | null): string {
   const { t } = useT("skills");
+  if (origin?.type === "skillhub") return t(($) => $.detail.refresh.source_skillhub);
   if (origin?.type === "clawhub") return t(($) => $.detail.refresh.source_clawhub);
   if (origin?.type === "skills_sh") return t(($) => $.detail.refresh.source_skills_sh);
   return t(($) => $.detail.refresh.source_github);
