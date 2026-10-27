@@ -55,10 +55,10 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 365 \
 ```bash
 # The hook endpoint. The signing secret is the whsec_… shown once when you
 # issued the plugin's token in workspace settings.
-MULTICA_SIGNING_SECRET=whsec_... node server/handler.mjs      # :8788
+MULTICA_SIGNING_SECRET=whsec_... node server/handler.mjs      # :20015
 
 # The MCP server behind the `metrics` hook.
-METRICS_TOKEN=metrics-dev-token node server/metrics-mcp.mjs   # :8789
+METRICS_TOKEN=metrics-dev-token node server/metrics-mcp.mjs   # :20016
 ```
 
 Both read `TLS_CERT` / `TLS_KEY`, defaulting to `dev-cert.pem` / `dev-key.pem`
@@ -69,7 +69,7 @@ guard refuses by design, so name them explicitly:
 
 ```bash
 export MULTICA_PLUGIN_DIR=examples/plugins
-export MULTICA_PLUGIN_DEV_ORIGINS=https://127.0.0.1:8788,https://127.0.0.1:8789
+export MULTICA_PLUGIN_DEV_ORIGINS=https://127.0.0.1:20015,https://127.0.0.1:20016
 export MULTICA_PLUGIN_DEV_CA=/path/to/your-dev-ca.pem
 ```
 

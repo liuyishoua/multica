@@ -1,5 +1,7 @@
 # multica
 
+> 文档中的 example.com 域名、192.0.2.* 地址、/opt/operator 路径及 20000 段端口均为示例，请按实际部署配置替换。私有账号配置与运行数据不随源码提交。
+
 [![Local changes: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/Local%20changes-PolyForm%20Noncommercial%201.0.0-orange)](LICENSE-LOCAL)
 
 基于 [multica-ai/multica](https://github.com/multica-ai/multica) 的本地部署副本，

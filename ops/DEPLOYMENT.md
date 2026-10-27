@@ -1,12 +1,12 @@
 # Multica 部署说明
 
-- 目录：`/home/ubuntu/leo-project/multica`
-- 公网入口：<https://d.58nft.net:9447/>（默认自动登录）
+- 目录：`/opt/operator/leo-project/multica`
+- 公网入口：<https://portal.example.com:20033/>（默认自动登录）
 - 版本：官方 Docker 镜像 `v0.6.1`，不自动升级。
 - 管理邮箱：`fyhvyhj@gmail.com`，Leo 工作区所有者。
 - 当前由 ops-hub 统一账号先校验应用权限，原始管理员默认可用，普通用户申请获批后才进入共享默认账号。获权成员在 Leo 工作区共享该账号的数据和权限。公开注册仍关闭。
 - PostgreSQL、后端、前端由 Docker Compose 运行；数据库与上传附件使用独立持久卷。
-- 后端及前端仅监听本机 8080、3000；公网通过 Caddy HTTPS 9447 访问。
+- 后端及前端仅监听本机 8080、3000；公网通过 Caddy HTTPS 20033 访问。
 - 系统重启后自动启动，容器退出自动恢复，每分钟检查应用可用性；连续三次失败后重启应用容器。
 - 每天北京时间 04:15 左右备份，保留约 14 天，路径 `/var/backups/multica`，仅 root 可读。备份包括数据库、上传附件和部署密钥。备份目前在本机，不能覆盖整机磁盘丢失。
 - 证书由原有 Caddy 服务续期，证书变动触发 Multica 代理重新加载。
@@ -33,8 +33,8 @@
 
 ```bash
 sudo systemctl status multica multica-proxy multica-default-login
-sudo docker compose -f /home/ubuntu/leo-project/multica/docker-compose.selfhost.yml ps
-curl -fsS https://d.58nft.net:9447/readyz
+sudo docker compose -f /opt/operator/leo-project/multica/docker-compose.selfhost.yml ps
+curl -fsS https://portal.example.com:20033/readyz
 sudo journalctl -u multica-watchdog -u multica-backup --since today
 sudo systemctl start multica-backup.service
 sudo systemctl restart multica.service
@@ -65,13 +65,13 @@ sudo systemctl start multica.service multica-proxy.service multica-watchdog.time
 - 智能体：`智能回复助手`，ID `82ce74c8-e570-4f8f-9b07-dc3fa59e567c`。
 - 模型：`gpt-6.1-sol`，思考强度 `medium`，智能体与守护进程并发上限均为 2。
 - Access：仅创建者可运行。指令默认进行中文问答和回复起草，实际发送外部消息或修改资源需要用户明确要求；此为行为指令，不是操作系统权限隔离。
-- CLI 配置及 PAT：`/home/ubuntu/.multica/config.json`，0600 权限；PAT 初始有效期 90 天，守护进程按官方机制自动续期。不将 PAT 或 Codex 登录凭据写入仓库。
+- CLI 配置及 PAT：`/opt/operator/.multica/config.json`，0600 权限；PAT 初始有效期 90 天，守护进程按官方机制自动续期。不将 PAT 或 Codex 登录凭据写入仓库。
 - 后台服务：`multica-agent-runtime.service`，以 ubuntu 用户运行，开机启动、退出自动重启。
 - 运行时自动检测到了本机 Hermes 与 Qwen CLI；本智能体只绑定 Codex。
 - 2026-10-09 已通过平台真实聊天验证：约 7 秒生成中文会议邀约回复，执行成功。
 
-直接聊天：<https://d.58nft.net:9447/leo/chat?agent=82ce74c8-e570-4f8f-9b07-dc3fa59e567c>。
-验证记录：<https://d.58nft.net:9447/leo/chat?session=01a120a5-4156-7c1c-8ccc-bf2b4c958713>。
+直接聊天：<https://portal.example.com:20033/leo/chat?agent=82ce74c8-e570-4f8f-9b07-dc3fa59e567c>。
+验证记录：<https://portal.example.com:20033/leo/chat?session=01a120a5-4156-7c1c-8ccc-bf2b4c958713>。
 
 ```bash
 sudo systemctl status multica-agent-runtime
@@ -101,11 +101,11 @@ multica agent list
 
 - 智能体：`Leo 项目操作助手`，ID `fc8e609f-8374-4526-b58f-642e5dfc2914`，仅创建者可运行，单智能体并发 1。
 - 复用本机 Codex，模型 `gpt-6.1-sol`，思考强度 medium。
-- 已绑定平台 Skill `leo-project-ops`，ID `bf9b5f1c-8c4d-45eb-918a-e7e9f9f96044`；接口工具与源说明在 `/home/ubuntu/leo-project/agent-tools/leo-project-ops/`。
+- 已绑定平台 Skill `leo-project-ops`，ID `bf9b5f1c-8c4d-45eb-918a-e7e9f9f96044`；接口工具与源说明在 `/opt/operator/leo-project/agent-tools/leo-project-ops/`。
 - 当前提供抖音演示 API、票务 API、模型 WebUI API、Multica CLI/API、闲鱼 Python SDK/脚本以及 Bifrost 链接文件入口。门户账号表单暂未自动接入；闲鱼未核实 Web 服务。以现有能力落实创意，不补建缺失系统。
 - 工具处理本机 HTTP 鉴权、来源校验和输出凭据脱敏，非 GET 需 `--execute`，写请求不自动重试。此助手使用 ubuntu 用户现有系统权限；Skill 中的行为要求不等同于系统隔离。
 
-聊天入口：<https://d.58nft.net:9447/leo/chat?agent=fc8e609f-8374-4526-b58f-642e5dfc2914>。
+聊天入口：<https://portal.example.com:20033/leo/chat?agent=fc8e609f-8374-4526-b58f-642e5dfc2914>。
 
 2026-10-09 平台执行验证：助手读取各项目状态、票务账号/任务列表与模型列表；在抖音 demo 环境创建临时标签、查询核对并删除。验证会话 01a120ac-c2ec-75e6-9c3e-d7e96c739500。
 

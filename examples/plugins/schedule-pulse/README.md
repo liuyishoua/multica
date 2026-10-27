@@ -32,7 +32,7 @@ Point `transport.url` at this process and declare the matching `net:` scope.
 Local development also needs:
 
 ```bash
-export MULTICA_PLUGIN_DEV_ORIGINS=https://localhost:8787
+export MULTICA_PLUGIN_DEV_ORIGINS=https://localhost:20014
 ```
 
 Without that opt-in the host refuses a private address.

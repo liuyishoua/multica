@@ -90,7 +90,7 @@ what the admin approved.
 ## Local development
 
 ```bash
-export MULTICA_PLUGIN_DEV_ORIGINS=https://localhost:8787
+export MULTICA_PLUGIN_DEV_ORIGINS=https://localhost:20014
 ```
 
 Then point `transport.url` at your local handler and declare the matching
